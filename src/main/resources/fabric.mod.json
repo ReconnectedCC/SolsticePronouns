@@ -3,8 +3,10 @@
   "id": "solstice-pronouns",
   "version": "${version}",
   "name": "Solstice Pronouns",
-  "description": "",
-  "authors": [],
+  "description": "Pronouns for Solstice",
+  "authors": [
+    "AlexDevs"
+  ],
   "contact": {},
   "license": "MIT",
   "environment": "server",
