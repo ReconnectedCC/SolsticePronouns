@@ -18,12 +18,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class PronounsModule extends ModuleBase {
+public class PronounsModule extends ModuleBase.Toggleable {
     public static final String ID = "pronouns";
 
     public PronounsModule() {
         super(ID);
+    }
 
+    @Override
+    public void init() {
         Solstice.configManager.registerData(ID, PronounsConfig.class, PronounsConfig::new);
         Solstice.localeManager.registerModule(ID, PronounsLocale.MODULE);
         Solstice.playerData.registerData(ID, PronounsPlayerData.class, PronounsPlayerData::new);

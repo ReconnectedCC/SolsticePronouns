@@ -11,6 +11,7 @@ public class ModuleProvider implements ModuleEntrypoint {
     private static final List<ModuleBase> modules = List.of(
             new PronounsModule()
     );
+
     @Override
     public HashSet<ModuleBase> register() {
         return new HashSet<>(modules);
