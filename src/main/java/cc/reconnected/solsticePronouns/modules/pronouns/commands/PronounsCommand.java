@@ -57,13 +57,15 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
                 )
                 .then(CommandManager.literal("forceset")
                         .requires(source -> module.getConfig().allowedForceSet.contains(source.getName()))
-                        .then(CommandManager.argument("first", StringArgumentType.word())
+                        .then(CommandManager.argument("player", StringArgumentType.word())
+                            .then(CommandManager.argument("first", StringArgumentType.word())
                                 .suggests((context, builder) -> {
                                     var firsts = module.getFirstAndMeta();
                                     return CommandSource.suggestMatching(firsts, builder);
                                 })
-                                .executes(context -> execute(
+                                .executes(context -> forceSet(
                                         context,
+                                        StringArgumentType.getString(context, "player"),
                                         StringArgumentType.getString(context, "first"),
                                         null))
                                 .then(CommandManager.argument("second", StringArgumentType.word())
@@ -72,16 +74,15 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
                                             var secondMatching = module.getSecondMatching(first);
                                             return CommandSource.suggestMatching(secondMatching, builder);
                                         })
-                                        .then(CommandManager.argument("player", StringArgumentType.word())
-                                                .executes(context -> forceSet(
-                                                        context,
-                                                        StringArgumentType.getString(context, "first"),
-                                                        StringArgumentType.getString(context, "second"),
-                                                        StringArgumentType.getString(context, "player")
-                                                ))
-                                        )
+                                        .executes(context -> forceSet(
+                                                context,
+                                                StringArgumentType.getString(context, "player"),
+                                                StringArgumentType.getString(context, "first"),
+                                                StringArgumentType.getString(context, "second")
+                                        ))
+
                                 )
-                        )
+                        )   )
                 );
     }
 
@@ -133,7 +134,7 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
         return 1;
     }
 
-    private int forceSet(CommandContext<ServerCommandSource> context, String first, @Nullable String second, String playerName) throws CommandSyntaxException {
+    private int forceSet(CommandContext<ServerCommandSource> context, String playerName, String first, @Nullable String second) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity executor = source.getPlayerOrThrow();
         var config = module.getConfig();
