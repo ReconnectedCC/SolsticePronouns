@@ -10,6 +10,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -56,33 +57,34 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
                         )
                 )
                 .then(CommandManager.literal("forceset")
-                        .requires(source -> module.getConfig().allowedForceSet.contains(source.getName()))
+                        // Use Fabric Permissions API to gate this command node.
+                        .requires(source -> Permissions.check(source, "solstice.pronouns.forceset", false))
                         .then(CommandManager.argument("player", StringArgumentType.word())
-                            .then(CommandManager.argument("first", StringArgumentType.word())
-                                .suggests((context, builder) -> {
-                                    var firsts = module.getFirstAndMeta();
-                                    return CommandSource.suggestMatching(firsts, builder);
-                                })
-                                .executes(context -> forceSet(
-                                        context,
-                                        StringArgumentType.getString(context, "player"),
-                                        StringArgumentType.getString(context, "first"),
-                                        null))
-                                .then(CommandManager.argument("second", StringArgumentType.word())
+                                .then(CommandManager.argument("first", StringArgumentType.word())
                                         .suggests((context, builder) -> {
-                                            var first = StringArgumentType.getString(context, "first");
-                                            var secondMatching = module.getSecondMatching(first);
-                                            return CommandSource.suggestMatching(secondMatching, builder);
+                                            var firsts = module.getFirstAndMeta();
+                                            return CommandSource.suggestMatching(firsts, builder);
                                         })
                                         .executes(context -> forceSet(
                                                 context,
                                                 StringArgumentType.getString(context, "player"),
                                                 StringArgumentType.getString(context, "first"),
-                                                StringArgumentType.getString(context, "second")
-                                        ))
-
+                                                null))
+                                        .then(CommandManager.argument("second", StringArgumentType.word())
+                                                .suggests((context, builder) -> {
+                                                    var first = StringArgumentType.getString(context, "first");
+                                                    var secondMatching = module.getSecondMatching(first);
+                                                    return CommandSource.suggestMatching(secondMatching, builder);
+                                                })
+                                                .executes(context -> forceSet(
+                                                        context,
+                                                        StringArgumentType.getString(context, "player"),
+                                                        StringArgumentType.getString(context, "first"),
+                                                        StringArgumentType.getString(context, "second")
+                                                ))
+                                        )
                                 )
-                        )   )
+                        )
                 );
     }
 
@@ -136,14 +138,7 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
 
     private int forceSet(CommandContext<ServerCommandSource> context, String playerName, String first, @Nullable String second) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
-        ServerPlayerEntity executor = source.getPlayerOrThrow();
-        var config = module.getConfig();
-        var allowed = config.allowedForceSet;
-        if (!allowed.contains(executor.getName().getString())) {
-            source.sendFeedback(() -> module.locale().get("noPermissionForceSet"), false);
-            return 0;
-        }
-
+        // At this point, the Fabric Permissions API has already ensured the executor has the required permission.
         ServerPlayerEntity targetPlayer = source.getServer().getPlayerManager().getPlayer(playerName);
         if (targetPlayer == null) {
             source.sendFeedback(() -> module.locale().get("playerNotFound"), false);
@@ -158,7 +153,6 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
         }
 
         var data = module.getPlayer(targetPlayer.getUuid());
-
         data.first = first;
         data.second = second;
 
