@@ -9,6 +9,7 @@ import me.alexdevs.solstice.api.module.ModCommand;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -36,19 +37,49 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
                                     var firsts = module.getFirstAndMeta();
                                     return CommandSource.suggestMatching(firsts, builder);
                                 })
-                                .executes(context -> execute(context,
+                                .executes(context -> execute(
+                                        context,
                                         StringArgumentType.getString(context, "first"),
                                         null))
                                 .then(CommandManager.argument("second", StringArgumentType.word())
                                         .suggests((context, builder) -> {
                                             var first = StringArgumentType.getString(context, "first");
                                             var secondMatching = module.getSecondMatching(first);
-
                                             return CommandSource.suggestMatching(secondMatching, builder);
                                         })
-                                        .executes(context -> execute(context,
+                                        .executes(context -> execute(
+                                                context,
                                                 StringArgumentType.getString(context, "first"),
-                                                StringArgumentType.getString(context, "second")))
+                                                StringArgumentType.getString(context, "second")
+                                        ))
+                                )
+                        )
+                )
+                .then(CommandManager.literal("forceset")
+                        .requires(source -> module.getConfig().allowedForceSet.contains(source.getName()))
+                        .then(CommandManager.argument("first", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    var firsts = module.getFirstAndMeta();
+                                    return CommandSource.suggestMatching(firsts, builder);
+                                })
+                                .executes(context -> execute(
+                                        context,
+                                        StringArgumentType.getString(context, "first"),
+                                        null))
+                                .then(CommandManager.argument("second", StringArgumentType.word())
+                                        .suggests((context, builder) -> {
+                                            var first = StringArgumentType.getString(context, "first");
+                                            var secondMatching = module.getSecondMatching(first);
+                                            return CommandSource.suggestMatching(secondMatching, builder);
+                                        })
+                                        .then(CommandManager.argument("player", StringArgumentType.word())
+                                                .executes(context -> forceSet(
+                                                        context,
+                                                        StringArgumentType.getString(context, "first"),
+                                                        StringArgumentType.getString(context, "second"),
+                                                        StringArgumentType.getString(context, "player")
+                                                ))
+                                        )
                                 )
                         )
                 );
@@ -68,12 +99,12 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
 
         if (config.meta.contains(first)) {
             second = null;
-        } else if(!config.first.contains(first)) {
+        } else if (!config.first.contains(first)) {
             context.getSource().sendFeedback(() -> module.locale().get("invalidFirst"), false);
             return 0;
         }
 
-        if(second != null && !module.getSecondMatching(first).contains(second)) {
+        if (second != null && !module.getSecondMatching(first).contains(second)) {
             context.getSource().sendFeedback(() -> module.locale().get("invalidSecond"), false);
             return 0;
         }
@@ -88,7 +119,6 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
         );
 
         context.getSource().sendFeedback(() -> module.locale().get("pronounsSet", map), false);
-
         return 1;
     }
 
@@ -100,7 +130,42 @@ public class PronounsCommand extends ModCommand<PronounsModule> {
         data.second = null;
 
         context.getSource().sendFeedback(() -> module.locale().get("cleared"), false);
+        return 1;
+    }
 
+    private int forceSet(CommandContext<ServerCommandSource> context, String first, @Nullable String second, String playerName) throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
+        ServerPlayerEntity executor = source.getPlayerOrThrow();
+        var config = module.getConfig();
+        var allowed = config.allowedForceSet;
+        if (!allowed.contains(executor.getName().getString())) {
+            source.sendFeedback(() -> module.locale().get("noPermissionForceSet"), false);
+            return 0;
+        }
+
+        ServerPlayerEntity targetPlayer = source.getServer().getPlayerManager().getPlayer(playerName);
+        if (targetPlayer == null) {
+            source.sendFeedback(() -> module.locale().get("playerNotFound"), false);
+            return 0;
+        }
+
+        if (second == null) {
+            var candidates = module.getSecondMatching(first);
+            if (!candidates.isEmpty()) {
+                second = candidates.get(0);
+            }
+        }
+
+        var data = module.getPlayer(targetPlayer.getUuid());
+
+        data.first = first;
+        data.second = second;
+
+        var map = Map.of(
+                "pronouns", module.getPlayerPronouns(targetPlayer.getUuid())
+        );
+
+        source.sendFeedback(() -> module.locale().get("pronounsSet", map), false);
         return 1;
     }
 }

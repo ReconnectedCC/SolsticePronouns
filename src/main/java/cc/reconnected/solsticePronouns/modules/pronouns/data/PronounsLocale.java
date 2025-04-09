@@ -7,6 +7,8 @@ public class PronounsLocale {
             Map.entry("pronounsSet", "<green>Pronouns set to <yellow>${pronouns}</yellow>!</green>"),
             Map.entry("invalidFirst", "<gold>The first part is invalid!</gold>"),
             Map.entry("invalidSecond", "<gold>The second part is invalid!</gold>"),
-            Map.entry("cleared", "<gold>Pronouns cleared!</gold>")
+            Map.entry("cleared", "<gold>Pronouns cleared!</gold>"),
+            Map.entry("playerNotFound","<gold>The player was not found!</gold>"),
+            Map.entry("noPermissionForceSet","<gold>You do not have permission to run this command</gold>")
     );
 }
