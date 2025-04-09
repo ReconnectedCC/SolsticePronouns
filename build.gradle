@@ -27,7 +27,6 @@ repositories {
         name = "Ladysnake Libs"
         url = 'https://maven.ladysnake.org/releases'
     }
-    mavenCentral()
 }
 
 dependencies {
@@ -37,13 +36,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "me.alexdevs:solstice:${project.solstice_version}"
 
-    include modImplementation("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
-
-
     include implementation("org.spongepowered:configurate-core:${project.configurate_version}")
 
     include modImplementation("me.lucko:fabric-permissions-api:${project.permissions_api_version}")
-
     include modImplementation("eu.pb4:placeholder-api:${project.placeholderapi_version}")
     include modImplementation("eu.pb4:sgui:${project.sgui_version}")
 }

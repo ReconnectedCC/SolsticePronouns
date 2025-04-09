@@ -34,7 +34,7 @@ public class PronounsModule extends ModuleBase.Toggleable {
         commands.add(new PronounsCommand(this));
 
         Placeholders.register(new Identifier("player", "pronouns"), (context, args) -> {
-            if(!context.hasPlayer())
+            if (!context.hasPlayer())
                 return PlaceholderResult.invalid("No player!");
 
             return PlaceholderResult.value(getPlayerTag(context.player().getUuid()));
@@ -59,14 +59,14 @@ public class PronounsModule extends ModuleBase.Toggleable {
         var index = firstAndMeta.indexOf(first);
 
         // first part is invalid
-        if(index == -1) {
+        if (index == -1) {
             return List.of();
         }
 
         var config = getConfig();
 
         // first part is meta and cannot have second
-        if(index >= config.first.size()) {
+        if (index >= config.first.size()) {
             return List.of();
         }
 
@@ -88,7 +88,7 @@ public class PronounsModule extends ModuleBase.Toggleable {
 
         Map<String, Text> map;
         String format;
-        if(second == null) {
+        if (second == null) {
             map = Map.of(
                     "pronoun", Text.of(first)
             );
@@ -123,7 +123,7 @@ public class PronounsModule extends ModuleBase.Toggleable {
     }
 
     public Text getPlayerTag(UUID uuid) {
-        if(hasPronouns(uuid)) {
+        if (hasPronouns(uuid)) {
             var pronouns = getPlayerPronouns(uuid);
             return getTag(pronouns);
         }

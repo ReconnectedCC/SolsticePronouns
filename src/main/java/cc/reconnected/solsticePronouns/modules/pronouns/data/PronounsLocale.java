@@ -8,7 +8,8 @@ public class PronounsLocale {
             Map.entry("invalidFirst", "<gold>The first part is invalid!</gold>"),
             Map.entry("invalidSecond", "<gold>The second part is invalid!</gold>"),
             Map.entry("cleared", "<gold>Pronouns cleared!</gold>"),
-            Map.entry("playerNotFound","<gold>The player was not found!</gold>"),
-            Map.entry("noPermissionForceSet","<gold>You do not have permission to run this command</gold>")
+            Map.entry("otherCleared", "<gold><yellow>${player}</yellow>'s pronouns cleared!</gold>"),
+            Map.entry("playerNotFound","<gold>Player not found!</gold>"),
+            Map.entry("otherPronounsSet", "<green><yellow>${player}</yellow>'s pronouns set to <yellow>${pronouns}</yellow>!</green>")
     );
 }

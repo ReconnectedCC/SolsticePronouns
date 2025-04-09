@@ -28,9 +28,6 @@ public class PronounsConfig {
             "other"
     );
 
-    @Comment("A list of players that are allowed to use the forceset command")
-    public List<String> allowedForceSet = null;
-
     @Comment("First part of the nominative pronouns: *first*/second. The indices have to match the set. i.e. he/him, she/her, ...")
     public List<String> first = List.of(
             "he",
