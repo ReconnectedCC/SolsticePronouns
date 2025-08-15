@@ -6,7 +6,6 @@ import me.alexdevs.solstice.api.module.ModuleEntrypoint;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class ModuleProvider implements ModuleEntrypoint {
