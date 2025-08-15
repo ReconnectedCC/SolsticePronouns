@@ -9,8 +9,8 @@ import eu.pb4.placeholders.api.Placeholders;
 import me.alexdevs.solstice.Solstice;
 import me.alexdevs.solstice.api.module.ModuleBase;
 import me.alexdevs.solstice.api.text.Format;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,25 +19,23 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PronounsModule extends ModuleBase.Toggleable {
-    public static final String ID = "pronouns";
-
-    public PronounsModule() {
-        super(ID);
+    public PronounsModule(ResourceLocation id) {
+        super(id);
     }
 
     @Override
     public void init() {
-        Solstice.configManager.registerData(ID, PronounsConfig.class, PronounsConfig::new);
-        Solstice.localeManager.registerModule(ID, PronounsLocale.MODULE);
-        Solstice.playerData.registerData(ID, PronounsPlayerData.class, PronounsPlayerData::new);
+        Solstice.configManager.registerData(id, PronounsConfig.class, PronounsConfig::new);
+        Solstice.localeManager.registerModule(id, PronounsLocale.MODULE);
+        Solstice.playerData.registerData(id, PronounsPlayerData.class, PronounsPlayerData::new);
 
         commands.add(new PronounsCommand(this));
 
-        Placeholders.register(new Identifier("player", "pronouns"), (context, args) -> {
+        Placeholders.register(new ResourceLocation("player", "pronouns"), (context, args) -> {
             if (!context.hasPlayer())
                 return PlaceholderResult.invalid("No player!");
 
-            return PlaceholderResult.value(getPlayerTag(context.player().getUuid()));
+            return PlaceholderResult.value(getPlayerTag(context.player().getUUID()));
         });
     }
 
@@ -83,20 +81,20 @@ public class PronounsModule extends ModuleBase.Toggleable {
         return Solstice.playerData.get(uuid).getData(PronounsPlayerData.class);
     }
 
-    public Text getPronouns(String first, @Nullable String second) {
+    public Component getPronouns(String first, @Nullable String second) {
         var config = getConfig();
 
-        Map<String, Text> map;
+        Map<String, Component> map;
         String format;
         if (second == null) {
             map = Map.of(
-                    "pronoun", Text.of(first)
+                    "pronoun", Component.nullToEmpty(first)
             );
             format = config.metaFormat;
         } else {
             map = Map.of(
-                    "first", Text.of(first),
-                    "second", Text.of(second)
+                    "first", Component.nullToEmpty(first),
+                    "second", Component.nullToEmpty(second)
             );
             format = config.nominativeFormat;
         }
@@ -104,7 +102,7 @@ public class PronounsModule extends ModuleBase.Toggleable {
         return Format.parse(format, map);
     }
 
-    public Text getTag(Text pronouns) {
+    public Component getTag(Component pronouns) {
         var config = getConfig();
         var map = Map.of(
                 "pronouns", pronouns
@@ -117,12 +115,12 @@ public class PronounsModule extends ModuleBase.Toggleable {
         return getPlayer(uuid).first != null;
     }
 
-    public Text getPlayerPronouns(UUID uuid) {
+    public Component getPlayerPronouns(UUID uuid) {
         var data = getPlayer(uuid);
         return getPronouns(data.first, data.second);
     }
 
-    public Text getPlayerTag(UUID uuid) {
+    public Component getPlayerTag(UUID uuid) {
         if (hasPronouns(uuid)) {
             var pronouns = getPlayerPronouns(uuid);
             return getTag(pronouns);
