@@ -31,7 +31,7 @@ public class PronounsModule extends ModuleBase.Toggleable {
 
         commands.add(new PronounsCommand(this));
 
-        Placeholders.register(new ResourceLocation("player", "pronouns"), (context, args) -> {
+        Placeholders.register(ResourceLocation.fromNamespaceAndPath("player", "pronouns"), (context, args) -> {
             if (!context.hasPlayer())
                 return PlaceholderResult.invalid("No player!");
 
