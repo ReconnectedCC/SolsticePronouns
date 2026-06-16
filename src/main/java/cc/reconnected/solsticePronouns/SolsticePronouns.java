@@ -1,10 +1,10 @@
 package cc.reconnected.solsticePronouns;
 
+import me.alexdevs.solstice.api.utils.SolsticeIdentifier;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.ResourceLocation;
 
 public class SolsticePronouns implements ModInitializer {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("solsticepronouns", "");
+    public static final SolsticeIdentifier ID = SolsticeIdentifier.of("solsticepronouns", "");
 
     @Override
     public void onInitialize() {

@@ -9,6 +9,7 @@ import eu.pb4.placeholders.api.Placeholders;
 import me.alexdevs.solstice.Solstice;
 import me.alexdevs.solstice.api.module.ModuleBase;
 import me.alexdevs.solstice.api.text.Format;
+import me.alexdevs.solstice.api.utils.SolsticeIdentifier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PronounsModule extends ModuleBase.Toggleable {
-    public PronounsModule(ResourceLocation id) {
+    public PronounsModule(SolsticeIdentifier id) {
         super(id);
     }
 
